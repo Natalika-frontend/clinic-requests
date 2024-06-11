@@ -18,7 +18,7 @@ const registration = async (req, res) => {
         const {email, password} = req.body;
         const candidate = await User.findOne({email});
         if (candidate) {
-            return res.status(400).json({message: 'User with this email already exists'});
+            return res.status(409).json({message: 'User with this email already exists'});
         }
         const hashPassword = await bcrypt.hash(password, 10);
         const userRole = await Role.findOne({value: 'USER'});
