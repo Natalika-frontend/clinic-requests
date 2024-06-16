@@ -43,27 +43,22 @@ const login = async (req, res) => {
             return res.status(400).json({message: 'Invalid password'});
         }
         const token = generateToken(user._id, user.roles);
-        return res.json({token});
+        res.cookie('token', token, {
+            httpOnly: true,
+            sameSite: 'Strict',
+            secure: process.env.NODE_ENV === 'production'
+        });
+        return res.json({message: 'Login successful', role: user.roles});
     } catch (e) {
         console.log(e);
         res.status(400).json({message: 'Login error'});
     }
 };
 
-const getUsers = async (req, res) => {
-    try {
-        const users = await User.find();
-        res.json(users);
-    } catch (e) {
-        console.log(e);
-        res.status(400).json({message: 'Error fetching users'});
-    }
-};
-
 const logout = async (req, res) => {
-    res.cookie('token', '', {httpOnly: true});
+    res.cookie('token', '', {httpOnly: true, expires: new Date(0)});
 
-    res.redirect('/login');
+    return res.json({message: 'Logout successful'});
 };
 
-module.exports = {registration, login, getUsers, logout};
+module.exports = {registration, login, logout};
